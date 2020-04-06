@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
-
+#include <iostream>
 #include "linux_parser.h"
 
 using std::stof;
@@ -70,7 +70,15 @@ vector<int> LinuxParser::Pids() {
 float LinuxParser::MemoryUtilization() { return 0.0; }
 
 // TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime() { 
+  string value;
+  std::ifstream file(kProcDirectory + kUptimeFilename);
+  if(file.is_open()){
+  	file >> value;
+  }
+  file.close();
+  return std::stoi(value);
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
@@ -89,10 +97,40 @@ long LinuxParser::IdleJiffies() { return 0; }
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
 // TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+int LinuxParser::TotalProcesses() { 
+  string line;
+  string key;
+  string value;
+  std::ifstream file(kProcDirectory + kStatFilename);
+  if(file.is_open()){
+    while(file >> key){
+    	if(key =="processes"){
+        	file >> value;
+          break;
+        }
+      getline(file,line);
+    }	
+  }
+  return std::stoi(value); 
+}
 
 // TODO: Read and return the number of running processes
-int LinuxParser::RunningProcesses() { return 0; }
+int LinuxParser::RunningProcesses() { 
+ string line;
+  string key;
+  string value;
+  std::ifstream file(kProcDirectory + kStatFilename);
+  if(file.is_open()){
+    while(file >> key){
+    	if(key =="procs_running"){
+        	file >> value;
+          break;
+        }
+      getline(file,line);
+    }	
+  }
+  return std::stoi(value); 
+}
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
@@ -112,4 +150,6 @@ string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime(int pid[[maybe_unused]]) { 
+	return 0;
+}
